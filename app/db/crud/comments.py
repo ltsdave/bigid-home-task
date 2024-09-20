@@ -1,27 +1,32 @@
 from fastapi import HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 
 from app.db import crud, models, schemas
 
 
-def get_one(db: Session, comment_id: int) -> models.Comment:
-    return db.query(models.Comment).filter(models.Comment.id == comment_id).first()
+async def get_one(session: AsyncSession, comment_id: int) -> models.Comment:
+    query = select(models.Comment).where(models.Comment.id == comment_id)
+    result = await session.execute(query)
+    return result.scalar()
 
 
-def get_all(db: Session, article_id: int) -> list[models.Comment]:
+async def get_all(session: AsyncSession, article_id: int) -> list[models.Comment]:
     if not article_id:
-        return db.query(models.Comment).all()
+        query = select(models.Comment)
+        result = await session.execute(query)
+        return result.scalars()
     else:
-        article = crud.articles.get_one(db=db, article_id=article_id, show_relation=True)
+        article = await crud.articles.get_one(session=session, article_id=article_id, fetch_comments=True)
         if not article:
-            raise HTTPException(status_code=404, detail="article not found")
+            raise HTTPException(status_code=404, detail="Article not found")
         else:
             return article.comments
 
 
-def create(db: Session, comment: schemas.CommentCreate) -> models.Comment:
-    db_article = models.Comment(**comment.model_dump())
-    db.add(db_article)
-    db.commit()
-    db.refresh(db_article)
-    return db_article
+async def create(session: AsyncSession, comment_create: schemas.CommentCreate) -> models.Comment:
+    comment = models.Comment(**comment_create.model_dump())
+    session.add(comment)
+    await session.commit()
+    await session.refresh(comment)
+    return comment

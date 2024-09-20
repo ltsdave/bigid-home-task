@@ -1,26 +1,40 @@
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.orm import joinedload
 
 from app.db import models, schemas
 
 
-def get_one(db: Session, user_id: int, show_relation: bool = False) -> models.User:
-    if show_relation:
-        return db.query(models.User).filter(models.User.id == user_id).options(joinedload(models.User.articles)).first()
+async def get_one(session: AsyncSession, user_id: int, fetch_articles: bool = False) -> models.User:
+    if fetch_articles:
+        query = select(models.User).where(models.User.id == user_id).options(joinedload(models.User.articles))
     else:
-        return db.query(models.User).filter(models.User.id == user_id).first()
+        query = select(models.User).where(models.User.id == user_id)
+    result = await session.execute(query)
+    return result.scalar()
 
 
-def get_by_name(db: Session, name: str) -> models.User:
-    return db.query(models.User).filter(models.User.name == name).first()
+async def get_by_name(session: AsyncSession, name: str) -> models.User:
+    query = select(models.User).where(models.User.name == name)
+    result = await session.execute(query)
+    return result.scalar()
 
 
-def get_all(db: Session) -> list[models.User]:
-    return db.query(models.User).all()
+async def get_by_email(session: AsyncSession, email: str) -> models.User:
+    query = select(models.User).where(models.User.email == email)
+    result = await session.execute(query)
+    return result.scalar()
 
 
-def create(db: Session, user: schemas.UserCreate) -> models.User:
-    user = models.User(name=user.name, email=user.email)
-    db.add(user)
-    db.commit()
-    db.refresh(user)
+async def get_all(session: AsyncSession) -> list[models.User]:
+    query = select(models.User)
+    result = await session.execute(query)
+    return result.scalars().all()
+
+
+async def create(session: AsyncSession, user_create: schemas.UserCreate) -> models.User:
+    user = models.User(**user_create.model_dump())
+    session.add(user)
+    await session.commit()
+    await session.refresh(user)
     return user

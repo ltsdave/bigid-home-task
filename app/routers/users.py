@@ -1,30 +1,32 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db import schemas
-from app.db import crud
-from app.db.database import get_db
+from app.db import crud, schemas
+from app.db.database import get_session
 
 router = APIRouter(prefix="/users")
 
 
 @router.post("/", tags=["users"], response_model=schemas.User)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    user = crud.users.get_by_name(db=db, user=user.name)
-    if user:
+async def create_user(user_create: schemas.UserCreate, session: AsyncSession = Depends(get_session)):
+    existing_user = await crud.users.get_by_name(session=session, name=user_create.name)
+    if existing_user:
         raise HTTPException(status_code=400, detail="User already registered")
-    return crud.users.create(db=db, user=user)
+    existing_email = await crud.users.get_by_email(session=session, email=user_create.email)
+    if existing_email:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    return await crud.users.create(session=session, user_create=user_create)
 
 
 @router.get("/", tags=["users"], response_model=list[schemas.User])
-def get_users(db: Session = Depends(get_db)):
-    users = crud.users.get_all(db=db)
+async def get_users(session: AsyncSession = Depends(get_session)):
+    users = await crud.users.get_all(session=session)
     return users
 
 
 @router.get("/{user_id}", tags=["users"], response_model=schemas.User)
-def get_user(user_id: int, db: Session = Depends(get_db)):
-    user = crud.users.get_one(db=db, user_id=user_id)
+async def get_user(user_id: int, session: AsyncSession = Depends(get_session)):
+    user = await crud.users.get_one(session=session, user_id=user_id)
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return user

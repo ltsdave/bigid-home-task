@@ -1,30 +1,29 @@
 from fastapi import APIRouter, Depends, HTTPException
-from requests import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db import schemas
-from app.db import crud
-from app.db.database import get_db
+from app.db import crud, schemas
+from app.db.database import get_session
 
 router = APIRouter(prefix="/comments")
 
 
 @router.post("/", tags=["comments"], response_model=schemas.Comment)
-def create_comment(comment: schemas.CommentCreate, db: Session = Depends(get_db)):
-    article = crud.articles.get_one(db=db, article_id=comment.article_id)
+async def create_comment(comment_create: schemas.CommentCreate, session: AsyncSession = Depends(get_session)):
+    article = await crud.articles.get_one(session=session, article_id=comment_create.article_id)
     if not article:
-        raise HTTPException(status_code=400, detail="Comment is related to an unknown article")
-    return crud.comments.create(db=db, comment=comment)
+        raise HTTPException(status_code=400, detail="Comment is related to a non existing article")
+    return await crud.comments.create(session=session, comment_create=comment_create)
 
 
 @router.get("/", tags=["comments"], response_model=list[schemas.Comment])
-def get_comments(article_id: int = None, db: Session = Depends(get_db)):
-    comments = crud.comments.get_all(db=db, article_id=article_id)
+async def get_comments(article_id: int = None, session: AsyncSession = Depends(get_session)):
+    comments = await crud.comments.get_all(session=session, article_id=article_id)
     return comments
 
 
 @router.get("/{comment_id}", tags=["comments"], response_model=schemas.Comment)
-def get_comment(comment_id: int, db: Session = Depends(get_db)):
-    comment = crud.comments.get_one(db=db, comment_id=comment_id)
+async def get_comment(comment_id: int, session: AsyncSession = Depends(get_session)):
+    comment = await crud.comments.get_one(session=session, comment_id=comment_id)
     if comment is None:
-        raise HTTPException(status_code=404, detail="comment not found")
+        raise HTTPException(status_code=404, detail="Comment not found")
     return comment

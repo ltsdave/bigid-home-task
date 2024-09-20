@@ -29,7 +29,6 @@ class ArticleCreate(ArticleBase):
 class Article(ArticleBase):
     id: int
     publish_date: datetime
-    comments: list[Comment] = []
 
 
 class UserBase(BaseModel):
@@ -38,9 +37,8 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    pass
+    password: str
 
 
 class User(UserBase):
     id: int
-    articles: list[Article] = []

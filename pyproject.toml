@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "bigid"
+version = "0.1.0"
+description = "home task for bigid"
+authors = ["david liker"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = {extras = ["standard"], version = "^0.115.0"}
+requests = "^2.32.3"
+asyncio = "^3.4.3"
+uvicorn = "^0.30.6"
+sqlalchemy = "^2.0.35"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.black]
+line-length = 100

@@ -9,14 +9,9 @@ from app.db import crud, models, schemas
 
 
 async def get_one(session: AsyncSession, article_id: int, fetch_comments: bool = False) -> models.Article:
+    query = select(models.Article).where(models.Article.id == article_id)
     if fetch_comments:
-        query = (
-            select(models.Article)
-            .where(models.Article.id == article_id)
-            .options(joinedload(models.Article.comments))
-        )
-    else:
-        query = select(models.Article).where(models.Article.id == article_id)
+        query = query.options(joinedload(models.Article.comments))
     result = await session.execute(query)
     return result.scalar()
 

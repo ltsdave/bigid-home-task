@@ -6,10 +6,9 @@ from app.db import models, schemas
 
 
 async def get_one(session: AsyncSession, user_id: int, fetch_articles: bool = False) -> models.User:
+    query = select(models.User).where(models.User.id == user_id)
     if fetch_articles:
-        query = select(models.User).where(models.User.id == user_id).options(joinedload(models.User.articles))
-    else:
-        query = select(models.User).where(models.User.id == user_id)
+        query = query.options(joinedload(models.User.articles))
     result = await session.execute(query)
     return result.scalar()
 

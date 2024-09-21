@@ -36,3 +36,8 @@ async def get_article(article_id: int, session: AsyncSession = Depends(get_sessi
         logger.info(f"tried to fetch a non existing article with id {article_id}")
         raise HTTPException(status_code=404, detail="Article not found")
     return article
+
+
+@router.post("/find_words", tags=["articles"], response_model=list[str])
+async def find_words(words: list[str], session: AsyncSession = Depends(get_session)):
+    return words

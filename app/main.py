@@ -3,15 +3,19 @@ import asyncio
 import uvicorn
 from fastapi import APIRouter, FastAPI
 
+import logging
 from app.db import models
 from app.db.database import async_engine
 
 from .routers import articles, comments, users
 
+logger = logging.getLogger("app.logger")
+
 
 async def main():
     async with async_engine.begin() as conn:
         await conn.run_sync(models.Base.metadata.create_all)
+        logger.info("created tables")
 
     app = FastAPI()
     router_v1 = APIRouter(prefix="/v1")

@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 
 from fastapi import HTTPException
@@ -6,6 +7,8 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
 
 from app.db import crud, models, schemas
+
+logger = logging.getLogger("app.logger")
 
 
 async def get_one(session: AsyncSession, article_id: int, fetch_comments: bool = False) -> models.Article:
@@ -30,6 +33,7 @@ async def get_all(session: AsyncSession, author_id: int) -> list[models.Article]
     else:
         user = await crud.users.get_one(session=session, user_id=author_id, fetch_articles=True)
         if not user:
+            logger.info(f"tried to get all articles of a non existing author {author_id}")
             raise HTTPException(status_code=404, detail="author not found")
         else:
             return user.articles

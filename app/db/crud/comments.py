@@ -1,8 +1,12 @@
+import logging
+
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from app.db import crud, models, schemas
+
+logger = logging.getLogger("app.logger")
 
 
 async def get_one(session: AsyncSession, comment_id: int) -> models.Comment:
@@ -19,6 +23,7 @@ async def get_all(session: AsyncSession, article_id: int) -> list[models.Comment
     else:
         article = await crud.articles.get_one(session=session, article_id=article_id, fetch_comments=True)
         if not article:
+            logger.info(f"tried to get all comments of a non existing article {article_id}")
             raise HTTPException(status_code=404, detail="Article not found")
         else:
             return article.comments

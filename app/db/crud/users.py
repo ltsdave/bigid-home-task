@@ -28,7 +28,7 @@ async def get_by_email(session: AsyncSession, email: str) -> models.User:
 async def get_all(session: AsyncSession) -> list[models.User]:
     query = select(models.User)
     result = await session.execute(query)
-    return result.scalars().all()
+    return result.scalars()
 
 
 async def create(session: AsyncSession, user_create: schemas.UserCreate) -> models.User:

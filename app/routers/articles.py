@@ -3,10 +3,12 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.types import WordsOccurecnes
+from app.consts import LOGGER_ENV_NAME
 from app.db import crud, schemas
 from app.db.database import get_session
+from app.text_proccesors.find_words import build_word_occurences_object
 from app.utils import get_env_var
-from app.consts import LOGGER_ENV_NAME
 
 router = APIRouter(prefix="/articles")
 logger = logging.getLogger(get_env_var(LOGGER_ENV_NAME))
@@ -41,6 +43,9 @@ async def get_article(article_id: int, session: AsyncSession = Depends(get_sessi
     return article
 
 
-@router.post("/find_words", tags=["articles"], response_model=list[str])
+@router.post("/find_words", tags=["articles"], response_model=WordsOccurecnes)
 async def find_words(words: list[str], session: AsyncSession = Depends(get_session)):
-    return words
+    articles = await crud.articles.get_all(session=session, author_id=None)
+    articles_list = [article for article in articles]
+    words_occurecnes = build_word_occurences_object(words, articles_list)
+    return words_occurecnes

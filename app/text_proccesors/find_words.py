@@ -3,7 +3,7 @@ from app.types import WordsOccurecnes
 
 
 def build_word_occurences_object(words: list[str], articles: list[models.Article]) -> WordsOccurecnes:
-    words_occurences = []
+    words_occurences: WordsOccurecnes = []
     for word in words:
         word_occurences = {}
         for article in articles:
@@ -19,7 +19,7 @@ def build_word_occurences_object(words: list[str], articles: list[models.Article
 
 
 def find_word_offsets_in_text(word: str, text: str) -> list[int]:
-    offsets = []
+    offsets: list[str] = []
     start = 0
     while True:
         offset = text.find(word, start)

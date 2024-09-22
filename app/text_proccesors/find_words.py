@@ -7,7 +7,7 @@ def build_word_occurences_object(words: list[str], articles: list[models.Article
     for word in words:
         word_occurences = {}
         for article in articles:
-            offsets = _find_word_offsets_in_text(word, article.content)
+            offsets = find_word_offsets_in_text(word, article.content)
             if offsets:
                 if word in word_occurences:
                     word_occurences[word].append({"article_id": article.id, "offsets": offsets})
@@ -18,7 +18,7 @@ def build_word_occurences_object(words: list[str], articles: list[models.Article
     return words_occurences
 
 
-def _find_word_offsets_in_text(word: str, text: str) -> list[int]:
+def find_word_offsets_in_text(word: str, text: str) -> list[int]:
     offsets = []
     start = 0
     while True:

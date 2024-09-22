@@ -176,8 +176,10 @@ pyrightconfig.json
 # vscode
 .vscode/
 
-#Ds
+# Ds
 *.DS_Store
 
 # End of https://www.toptal.com/developers/gitignore/api/python
 
+# sqlite db
+*.db

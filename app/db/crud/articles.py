@@ -7,8 +7,10 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
 
 from app.db import crud, models, schemas
+from app.utils import get_env_var
+from app.consts import LOGGER_ENV_NAME
 
-logger = logging.getLogger("app.logger")
+logger = logging.getLogger(get_env_var(LOGGER_ENV_NAME))
 
 
 async def get_one(session: AsyncSession, article_id: int, fetch_comments: bool = False) -> models.Article:
@@ -33,7 +35,7 @@ async def get_all(session: AsyncSession, author_id: int) -> list[models.Article]
     else:
         user = await crud.users.get_one(session=session, user_id=author_id, fetch_articles=True)
         if not user:
-            logger.info(f"tried to get all articles of a non existing author {author_id}")
+            logger.error(f"tried to get all articles of a non existing author {author_id}")
             raise HTTPException(status_code=404, detail="author not found")
         else:
             return user.articles

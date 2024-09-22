@@ -2,9 +2,12 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///./bigid.db"
+from app.consts import DATABASE_URL_ENV_NAME
+from app.utils import get_env_var
 
-async_engine = create_async_engine(SQLALCHEMY_DATABASE_URL, echo=True, connect_args={"check_same_thread": False})
+async_engine = create_async_engine(
+    get_env_var(DATABASE_URL_ENV_NAME), echo=True, connect_args={"check_same_thread": False}
+)
 AsyncSessionLocal = sessionmaker(
     class_=AsyncSession,
     autocommit=False,

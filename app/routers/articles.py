@@ -8,6 +8,7 @@ from app.consts import LOGGER_ENV_NAME
 from app.db import crud, schemas
 from app.db.database import get_session
 from app.text_proccesors.find_words import build_word_occurences_object
+from app.text_proccesors.most_common_word import get_article_with_most_occurences_of_word
 from app.utils import get_env_var
 
 router = APIRouter(prefix="/articles")
@@ -47,5 +48,11 @@ async def get_article(article_id: int, session: AsyncSession = Depends(get_sessi
 async def find_words(words: list[str], session: AsyncSession = Depends(get_session)):
     articles = await crud.articles.get_all(session=session, author_id=None)
     articles_list = [article for article in articles]
-    words_occurecnes = build_word_occurences_object(words, articles_list)
-    return words_occurecnes
+    return build_word_occurences_object(words, articles_list)
+
+
+@router.post("/most_common_word", tags=["articles"], response_model=int | None)
+async def most_common_word(word: str, session: AsyncSession = Depends(get_session)):
+    articles = await crud.articles.get_all(session=session, author_id=None)
+    articles_list = [article for article in articles]
+    return get_article_with_most_occurences_of_word(word, articles_list)

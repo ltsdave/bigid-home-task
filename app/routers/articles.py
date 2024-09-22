@@ -29,6 +29,7 @@ async def create_article(article_create: schemas.ArticleCreate, session: AsyncSe
         raise HTTPException(status_code=400, detail="Article is written by a non existing author")
 
     article = await crud.articles.create(session=session, article_create=article_create)
+    logger.info(f"created a new article, clearing words cache")
     words_cache.clear()
     return article
 
@@ -52,12 +53,14 @@ async def get_article(article_id: int, session: AsyncSession = Depends(get_sessi
 @router.post("/find_words", tags=["articles"], response_model=WordsOccurecnes)
 async def find_words(words: list[str], session: AsyncSession = Depends(get_session)):
     words_occurecnes = words_cache.get_words_occurences(words)
+    logger.info(f"finished quering cache for word occurnces")
 
     words_outside_cache = words_cache.get_words_outside_cache(words)
     if words_outside_cache:
         articles = await crud.articles.get_all(session=session, author_id=None)
         articles_list = [article for article in articles]
         words_occurecnes_outside_cache = build_word_occurences_object(words_outside_cache, articles_list)
+        logger.info(f"finished building word occurences from database")
         words_occurecnes.extend(words_occurecnes_outside_cache)
         words_cache.update_cache(words_occurecnes_outside_cache, words_outside_cache)
 
@@ -68,4 +71,6 @@ async def find_words(words: list[str], session: AsyncSession = Depends(get_sessi
 async def most_common_word(word: str, session: AsyncSession = Depends(get_session)):
     articles = await crud.articles.get_all(session=session, author_id=None)
     articles_list = [article for article in articles]
-    return get_article_with_most_occurences_of_word(word, articles_list)
+    article_id = get_article_with_most_occurences_of_word(word, articles_list)
+    logger.info(f"calculated artile id with most occurences of {word}")
+    return article_id

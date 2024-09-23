@@ -1,7 +1,6 @@
 import asyncio
 import logging
 
-import dotenv
 import uvicorn
 from fastapi import APIRouter, FastAPI
 
@@ -16,7 +15,6 @@ logger = logging.getLogger(get_env_var(LOGGER_ENV_NAME))
 
 
 async def main():
-    dotenv.load_dotenv()
     async with async_engine.begin() as conn:
         await conn.run_sync(models.Base.metadata.create_all)
         logger.info("created tables")

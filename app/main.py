@@ -9,7 +9,7 @@ from app.db import models
 from app.db.database import async_engine
 from app.utils import get_env_var
 
-from .routers import articles, comments, users
+from .routers import articles, comments, users, tasks
 
 logger = logging.getLogger(get_env_var(LOGGER_ENV_NAME))
 
@@ -24,6 +24,7 @@ async def main():
     router_v1.include_router(articles.router)
     router_v1.include_router(comments.router)
     router_v1.include_router(users.router)
+    router_v1.include_router(tasks.router)
     app.include_router(router_v1)
 
     config = uvicorn.Config(

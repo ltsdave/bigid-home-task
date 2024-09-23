@@ -1,9 +1,11 @@
 from app.db import models
 
+from .celery import celery
 from .find_words import find_word_offsets_in_text
 
 
-def get_article_with_most_occurences_of_word(word: str, articles: list[models.Article]) -> int | None:
+@celery.task(name="most_common_word")
+def get_article_with_most_occurences_of_word(word: str, articles: list[models.Article]):
     max_occurences = 0
     article_id = None
     for article in articles:

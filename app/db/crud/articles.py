@@ -27,7 +27,7 @@ async def get_by_title(session: AsyncSession, title: str) -> models.Article:
     return result.scalar()
 
 
-async def get_all(session: AsyncSession, author_id: int) -> list[models.Article]:
+async def get_all(session: AsyncSession, author_id: int = None) -> list[models.Article]:
     if not author_id:
         query = select(models.Article)
         result = await session.execute(query)

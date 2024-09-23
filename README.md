@@ -6,7 +6,7 @@ This project is a home task for BigId involving an api and a databse
 
 Use the package manager [poetry](https://python-poetry.org/docs/) to install.
 
-```bash
+```bash 
 poetry install
 ```
 

@@ -20,7 +20,7 @@ async def most_common_word(word: str, session: AsyncSession = Depends(get_sessio
     articles = await crud.articles.get_all(session=session)
     articles_list = [article for article in articles]
     task = get_article_with_most_occurences_of_word.delay(word, articles_list)
-    logger.info(f"enqueued most_common_word task task_id - {task.id}")
+    logger.info(f"enqueued most_common_word task - {task.id}")
     return task.id
 
 
@@ -29,4 +29,4 @@ async def most_common_word_result(task_id: int):
     task_result = AsyncResult(task_id)
     result = {"task_id": task_id, "task_status": task_result.status, "task_result": task_result.result}
     logger.info(result)
-    return JSONResponse(result)
+    return result

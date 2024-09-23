@@ -17,7 +17,7 @@ logger = logging.getLogger(get_env_var(LOGGER_ENV_NAME))
 async def main():
     async with async_engine.begin() as conn:
         await conn.run_sync(models.Base.metadata.create_all)
-        logger.info("created tables")
+        logger.info("tables created")
 
     app = FastAPI()
     router_v1 = APIRouter(prefix="/v1")

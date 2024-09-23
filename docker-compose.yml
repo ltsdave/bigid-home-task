@@ -3,29 +3,24 @@ version: '3.8'
 services:
 
   web:
-    build: ./project
+    build: .
     ports:
-      - 8004:8000
-    command: uvicorn main:app --host 0.0.0.0 --reload
+      - 8000:8000
+    command: poetry run python -m app.main
     volumes:
-      - ./project:/usr/src/app
+      - ./persistent_data:/BigId/persistent_data
     environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - APP_PORT = 8000
+      - APP_HOST = 0.0.0.0
+      - LOGGER_NAME = app.loger
+      - DATABASE_URL = sqlite+aiosqlite:///./persistent_data/bigid.db
+      - CELERY_RESULT_BACKEND = redis://localhost:6379
+      - CELERY_BROKER_URL = redis://localhost:6379
     depends_on:
-      - redis
-
-  worker:
-    build: ./project
-    command: celery -A worker.celery worker --loglevel=info
-    volumes:
-      - ./project:/usr/src/app
-    environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
-    depends_on:
-      - web
       - redis
 
   redis:
     image: redis:7
+    ports:
+      - "6379:6379"  
+    restart: always

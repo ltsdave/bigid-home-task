@@ -1,8 +1,6 @@
 import logging
 
-from celery.result import AsyncResult
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.consts import LOGGER_ENV_NAME

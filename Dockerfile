@@ -1,6 +1,6 @@
 FROM python:3.12-slim
 
-# Set environment variables
+# Set poetry environment variables
 ENV POETRY_VIRTUALENVS_CREATE=false \
     POETRY_NO_INTERACTION=1
 

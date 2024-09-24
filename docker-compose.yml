@@ -17,6 +17,8 @@ services:
   worker:
     build: .
     command: celery -A app.text_proccesors.most_common_word.celery worker --loglevel=info
+    volumes:
+      - ./persistent_data:/BigId/persistent_data       
     env_file: 
       - .env
       - .env.docker-network

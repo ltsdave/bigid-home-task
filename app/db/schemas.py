@@ -15,6 +15,10 @@ class CommentCreate(CommentBase):
 class Comment(CommentBase):
     id: int
 
+    class Config:
+        orm_mode = True
+        from_attributes = True
+
 
 class ArticleBase(BaseModel):
     title: str
@@ -30,6 +34,10 @@ class Article(ArticleBase):
     id: int
     publish_date: datetime
 
+    class Config:
+        orm_mode = True
+        from_attributes = True
+
 
 class UserBase(BaseModel):
     name: str
@@ -42,3 +50,7 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
+
+    class Config:
+        orm_mode = True
+        from_attributes = True

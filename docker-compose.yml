@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - 8000:8000
+    command: poetry run python -m app.main
+    volumes:
+      - ./persistent_data:/BigId/persistent_data
+    env_file: 
+      - .env
+      - .env.docker-network
+    depends_on:
+      - redis
+
+  worker:
+    build: .
+    command: celery -A app.text_proccesors.most_common_word.celery worker --loglevel=info
+    env_file: 
+      - .env
+      - .env.docker-network
+    depends_on:
+      - web
+      - redis
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"  
+    restart: always

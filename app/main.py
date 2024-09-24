@@ -1,7 +1,6 @@
 import asyncio
 import logging
 
-import dotenv
 import uvicorn
 from fastapi import APIRouter, FastAPI
 
@@ -10,22 +9,22 @@ from app.db import models
 from app.db.database import async_engine
 from app.utils import get_env_var
 
-from .routers import articles, comments, users
+from .routers import articles, comments, users, tasks
 
 logger = logging.getLogger(get_env_var(LOGGER_ENV_NAME))
 
 
 async def main():
-    dotenv.load_dotenv()
     async with async_engine.begin() as conn:
         await conn.run_sync(models.Base.metadata.create_all)
-        logger.info("created tables")
+        logger.info("tables created")
 
     app = FastAPI()
     router_v1 = APIRouter(prefix="/v1")
     router_v1.include_router(articles.router)
     router_v1.include_router(comments.router)
     router_v1.include_router(users.router)
+    router_v1.include_router(tasks.router)
     app.include_router(router_v1)
 
     config = uvicorn.Config(

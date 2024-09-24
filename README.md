@@ -10,10 +10,12 @@ Use the package manager [poetry](https://python-poetry.org/docs/) to install.
 poetry install
 ```
 
-## Running the server
+## Running the compnents
 
 Running is also done with poetry.
 
 ```bash
+docker run -p 6379:6379 redis:7
+celery -A app.text_proccesors.most_common_word.celery worker --loglevel=info
 poetry run python -m app.main
 ```

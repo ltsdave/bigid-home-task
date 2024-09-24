@@ -65,12 +65,3 @@ async def find_words(words: list[str], session: AsyncSession = Depends(get_sessi
         words_cache.update_cache(words_occurecnes_outside_cache, words_outside_cache)
 
     return words_occurecnes
-
-
-@router.post("/most_common_word", tags=["articles"], response_model=int | None)
-async def most_common_word(word: str, session: AsyncSession = Depends(get_session)):
-    articles = await crud.articles.get_all(session=session)
-    articles_list = [article for article in articles]
-    article_id = get_article_with_most_occurences_of_word(word, articles_list)
-    logger.info(f"calculated artile id with most occurences of {word}")
-    return article_id

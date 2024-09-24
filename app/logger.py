@@ -8,7 +8,7 @@ logger.setLevel(logging.INFO)
 
 formatter = logging.Formatter("%(levelname)s - %(asctime)s - %(name)s - %(message)s")
 stream_handler = logging.StreamHandler()
-file_handler = logging.FileHandler(".log")
+file_handler = logging.FileHandler("./persistent_data/.log")
 stream_handler.setFormatter(formatter)
 file_handler.setFormatter(formatter)
 

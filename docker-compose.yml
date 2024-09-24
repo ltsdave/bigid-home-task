@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-
   web:
     build: .
     ports:
@@ -9,14 +8,16 @@ services:
     command: poetry run python -m app.main
     volumes:
       - ./persistent_data:/BigId/persistent_data
-    environment:
-      - APP_PORT = 8000
-      - APP_HOST = 0.0.0.0
-      - LOGGER_NAME = app.loger
-      - DATABASE_URL = sqlite+aiosqlite:///./persistent_data/bigid.db
-      - CELERY_RESULT_BACKEND = redis://localhost:6379
-      - CELERY_BROKER_URL = redis://localhost:6379
+    env_file: .env
     depends_on:
+      - redis
+
+  worker:
+    build: .
+    command: celery -A app.text_proccesors.most_common_word.celery worker --loglevel=info
+    env_file: .env
+    depends_on:
+      - web
       - redis
 
   redis:

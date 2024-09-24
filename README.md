@@ -1,6 +1,6 @@
 # BigId home task
 
-This project is a home task for BigId involving an api and a databse
+This project is a home task for BigId involving an api and a database
 
 ## Installation
 
@@ -26,8 +26,8 @@ poetry run python -m app.main
 
 ### With docker-compose
 Make sure you have the docker-compose.yaml to run. \
-Note that a second env file named .env.docker-network \
-is needed to override some variables for the containers work properly in the docker network.
+Note that a second env file named .env.docker-network is needed to\
+override some variables for the containers work properly in the docker network.
 ```bash
 docker-compose up
 ```
